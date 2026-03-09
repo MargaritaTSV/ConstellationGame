@@ -1,25 +1,15 @@
 import requests
 import python_ml.resources.graph as graph
+import python_ml.src.config as cfg
 
 class ModelService:
-    def __init__(self, model_name="deepseek-v3.1:671b-cloud", url="http://localhost:11434"):
+    def __init__(self, model_name=cfg.MODEL_NAME, url=cfg.MODEL_URL):
         self.model_name = model_name
         self.url = url
         self.api_url = f"{url}/api/generate"
-        self.connection_test()
-
-    def connection_test(self):
-        try:
-            response = requests.get(f"{self.url}/api/tags")
-            if response.status_code == 200:
-                print("Ollama connected")
-
-        except requests.exceptions.ConnectionError:
-            print("Connection error")
 
     @staticmethod
     def get_neighbors(states):
-        print("Getting neighbors...")
 
         neighbors = dict()
 
@@ -73,16 +63,15 @@ class ModelService:
                 "prompt": prompt,
                 "stream": False,
                 "options": {
-                    "temperature": 0.7,
+                    "temperature": cfg.TEMPERATURE,
                     "num_predict": 500
                 }
             }
 
-            response = requests.post(self.api_url, json=payload, timeout=60)
+            response = requests.post(self.api_url, json=payload, timeout=cfg.TIMEOUT)
             response.raise_for_status()
 
             raw_response = response.json()
-            print("Raw response received.")
             return raw_response
         except Exception as e:
             print(e)
@@ -90,7 +79,6 @@ class ModelService:
 
     @staticmethod
     def parse_response(raw_response):
-        print("Parsing response...")
 
         if raw_response is None or "response" not in raw_response:
             return "No response received"
@@ -102,7 +90,6 @@ class ModelService:
         return response
 
     def get_answer(self, cur_state, end_state, path, available_moves):
-        print("Getting model answer...")
         prompt = self.create_prompt(cur_state, end_state, path, available_moves)
         raw_response = self.send_request(prompt)
         response = self.parse_response(raw_response)

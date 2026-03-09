@@ -1,8 +1,11 @@
+import uvicorn
 from fastapi import FastAPI
 from pydantic import BaseModel
-from model_service import ModelService
+from starlette.responses import JSONResponse
 
-app = FastAPI()
+from python_ml.src.model_service import ModelService
+
+app = FastAPI(title="ConstellationGame API", description="API for getting model's moves")
 
 class MoveRequest(BaseModel):
     cur_state: str
@@ -15,21 +18,22 @@ model_service = ModelService()
 @app.post("/get_answer")
 def get_answer(request: MoveRequest):
 
-    answer = model_service.get_answer(
-        cur_state=request.cur_state,
-        end_state=request.end_state,
-        path=request.path,
-        available_moves=request.available_moves
-    )
+    try:
+        answer = model_service.get_answer(
+            cur_state=request.cur_state,
+            end_state=request.end_state,
+            path=request.path,
+            available_moves=request.available_moves
+        )
+        print(answer)
+        return {"answer": answer}
 
-    return {"answer": answer}
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": str(e)}
+        )
 
-@app.get("/test_answer")
-async def test_answer():
-    answer = model_service.get_answer(
-        cur_state="Cir",
-        end_state="Dor",
-        path=['Cir', 'Aps', 'Mus', 'Hor', 'Ret'],
-        available_moves=['Nor', 'Lup', 'Cen', 'TrA']
-    )
-    return {"answer": answer}
+if __name__ == "__main__":
+    print("LISTENING ON http://0.0.0.0:8000")
+    uvicorn.run(app, host="0.0.0.0", port=8000)
