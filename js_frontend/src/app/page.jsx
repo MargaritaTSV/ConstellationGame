@@ -3,6 +3,28 @@
 import { useState } from "react"
 import Link from "next/link"
 
+const presetModes = [
+  { id: "easy", label: "Легкий", description: "5 жизней, подсказки." },
+  { id: "normal", label: "Средний", description: "3 жизни, подсказки" },
+  { id: "hard", label: "Сложный", description: "1 жизнь." },
+]
+
+const difficultyChoices = [
+  { id: "easy", label: "да" },
+  { id: "medium", label: "нет" },
+]
+
+const inputMethodChoices = [
+  { id: "type", label: "вручную" },
+  { id: "select", label: "из списка" },
+]
+
+const rulesButtonClass =
+  "fixed top-8 right-14 z-50 text-right text-4xl uppercase tracking-[0.18em] text-zinc-300 transition-colors duration-200 hover:text-white md:text-5xl"
+
+const actionButtonClass =
+  "pointer-events-auto whitespace-nowrap text-right text-5xl uppercase tracking-[0.18em] text-foreground transition-all duration-200 hover:scale-110 hover:text-white md:text-6xl"
+
 export default function HomePage() {
   const [selectedMode, setSelectedMode] = useState("normal")
   const [customSettings, setCustomSettings] = useState({
@@ -11,196 +33,150 @@ export default function HomePage() {
     inputMethod: "type",
   })
 
-  const presetModes = [
-    { id: "easy", label: "Лёгкий", description: "Модель играет просто" },
-    { id: "normal", label: "Обычный", description: "Модель играет средне" },
-    { id: "hard", label: "Сложный", description: "Модель играет на максимуме" },
-  ]
-
   const getGameSettings = () => {
     if (selectedMode === "custom") {
-      return {
-        lives: customSettings.lives,
-        difficulty: customSettings.difficulty,
-        inputMethod: customSettings.inputMethod,
-      }
+      return { ...customSettings }
     }
-    
+
     const presets = {
       easy: { lives: 5, difficulty: "easy", inputMethod: "type" },
       normal: { lives: 3, difficulty: "medium", inputMethod: "type" },
       hard: { lives: 1, difficulty: "hard", inputMethod: "type" },
     }
+
     return presets[selectedMode]
   }
 
   const settings = getGameSettings()
   const gameUrl = `/game?lives=${settings.lives}&difficulty=${settings.difficulty}&inputMethod=${settings.inputMethod}`
+  const isCustom = selectedMode === "custom"
+
+  const setCustom = (patch) => {
+    setSelectedMode("custom")
+    setCustomSettings((prev) => ({ ...prev, ...patch }))
+  }
+
+  const modeClass = (isSelected) =>
+    `origin-left whitespace-nowrap uppercase tracking-[0.14em] text-white transition-all duration-200 hover:scale-110 hover:text-zinc-100 ${
+      isSelected ? "scale-110 text-5xl font-bold" : "text-4xl font-normal"
+    }`
+
+  const optionClass = (isSelected) =>
+    `origin-left whitespace-nowrap uppercase tracking-[0.08em] text-zinc-400 transition-all duration-200 hover:scale-110 hover:text-zinc-200 ${
+      isSelected ? "text-zinc-300 underline decoration-2 underline-offset-8" : ""
+    }`
 
   return (
-    <main className="min-h-screen bg-background flex flex-col items-center justify-center px-4 py-8">
-      {/* Rules button - top right with padding */}
-      <Link
-        href="/rules"
-        className="fixed top-6 right-8 text-2xl font-display text-muted-foreground hover:text-foreground transition-all duration-200 uppercase tracking-widest z-50"
-      >
-        Правила
-      </Link>
+    <main className="relative min-h-screen overflow-hidden bg-background px-8 py-10 md:px-14 md:py-12">
+      <img
+        src="/menu-stars.png"
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 -z-20 h-full w-full rotate-90 scale-[1.8] object-cover opacity-70"
+      />
+      <div className="pointer-events-none fixed inset-0 -z-10 bg-[#070b16]/65" />
 
-      {/* Header */}
-      <header className="text-center mb-12">
-        <h1 className="text-5xl md:text-7xl font-display tracking-widest text-foreground mb-4 drop-shadow-[0_0_20px_rgba(255,255,255,0.4)]">
-          СОЗВЕЗДИЯ
-        </h1>
-        <div className="w-20 h-px bg-foreground/30 mx-auto mb-4" />
-        <p className="text-muted-foreground text-lg tracking-wide">
-          Путешествие по звёздному небу
-        </p>
-      </header>
+      <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-6xl flex-col">
+        <div className="relative mt-4 flex items-end justify-between gap-8">
+          <div className="text-4xl text-zinc-300 md:text-5xl">*User*</div>
 
-      {/* Mode Selection */}
-      <div className="w-full max-w-3xl flex flex-col md:flex-row gap-8 md:gap-12 mb-12">
-        {/* Left: Preset Modes */}
-        <div className="flex-1">
-          <h2 className="text-base uppercase tracking-widest text-muted-foreground mb-4">
-            Режим игры
-          </h2>
-          <div className="w-full h-px bg-foreground/20 mb-4" />
-          
-          <div className="flex flex-col gap-3">
-            {presetModes.map((mode) => (
-              <button
-                key={mode.id}
-                onClick={() => setSelectedMode(mode.id)}
-                className={`text-left py-2 transition-all duration-200 group ${
-                  selectedMode === mode.id
-                    ? "text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <span className="text-2xl md:text-3xl font-display tracking-wide uppercase">
-                  {selectedMode === mode.id && "> "}
-                  {mode.label}
-                </span>
-                <p className="text-base text-muted-foreground mt-1 tracking-wide">
-                  {mode.description}
-                </p>
-              </button>
-            ))}
-          </div>
+          <h1 className="pointer-events-none absolute left-1/2 -translate-x-1/2 translate-y-1 whitespace-nowrap text-center text-6xl font-bold uppercase tracking-[0.22em] text-foreground md:text-7xl">
+            Созвездия
+          </h1>
+
+          <Link href="/rules" className={rulesButtonClass}>
+            Правила
+          </Link>
         </div>
 
-        {/* Right: Custom Settings */}
-        <div className="flex-1">
-          <button
-            onClick={() => setSelectedMode("custom")}
-            className={`text-left py-2 transition-all duration-200 mb-2 w-full ${
-              selectedMode === "custom"
-                ? "text-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <span className="text-base uppercase tracking-widest">
-              {selectedMode === "custom" && "> "}
+        <div className="mt-18 grid flex-1 gap-14 md:mt-24 md:grid-cols-[0.92fr_1.08fr] md:gap-12">
+          <section className="pr-6">
+            <h2 className="mb-4 whitespace-nowrap text-5xl font-bold uppercase tracking-[0.18em] text-foreground">
+              Режим игры
+            </h2>
+            <div className="mb-8 h-px w-full bg-foreground/20" />
+
+            <div className="flex flex-col gap-8">
+              {presetModes.map((mode) => {
+                const isSelected = selectedMode === mode.id
+
+                return (
+                  <button
+                    key={mode.id}
+                    onClick={() => setSelectedMode(mode.id)}
+                    className="grid grid-cols-[auto_1fr] items-baseline gap-3 text-left"
+                  >
+                    <span className={modeClass(isSelected)}>{mode.label}</span>
+                    <span className="whitespace-nowrap text-4xl tracking-[0.08em] text-zinc-500">
+                      {mode.description}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          </section>
+
+          <section className="pl-2">
+            <div className="mb-4 whitespace-nowrap text-5xl font-bold uppercase tracking-[0.18em] text-white">
               Индивидуальная настройка
-            </span>
-          </button>
-          <div className="w-full h-px bg-foreground/20 mb-4" />
-
-          {/* Lives Selection */}
-          <div className="mb-4">
-            <p className="text-base text-muted-foreground mb-2 uppercase tracking-widest">
-              Жизни
-            </p>
-            <div className="flex gap-2">
-              {[1, 3, 5].map((num) => (
-                <button
-                  key={num}
-                  onClick={() => {
-                    setSelectedMode("custom")
-                    setCustomSettings((prev) => ({ ...prev, lives: num }))
-                  }}
-                  className={`px-5 py-2 text-2xl font-display transition-all duration-200 tracking-wide ${
-                    selectedMode === "custom" && customSettings.lives === num
-                      ? "text-foreground border-b-2 border-foreground"
-                      : "text-muted-foreground hover:text-foreground border-b-2 border-transparent"
-                  }`}
-                >
-                  {num}
-                </button>
-              ))}
             </div>
-          </div>
+            <div className="mb-8 h-px w-full bg-foreground/20" />
 
-          {/* Difficulty Selection */}
-          <div className="mb-4">
-            <p className="text-base text-muted-foreground mb-2 uppercase tracking-widest">
-              Мастерство модели
-            </p>
-            <div className="flex gap-2">
-              {[
-                { id: "easy", label: "Легко" },
-                { id: "medium", label: "Средне" },
-                { id: "hard", label: "Сложно" },
-              ].map((diff) => (
-                <button
-                  key={diff.id}
-                  onClick={() => {
-                    setSelectedMode("custom")
-                    setCustomSettings((prev) => ({ ...prev, difficulty: diff.id }))
-                  }}
-                  className={`px-4 py-2 text-xl font-display transition-all duration-200 tracking-wide ${
-                    selectedMode === "custom" && customSettings.difficulty === diff.id
-                      ? "text-foreground border-b-2 border-foreground"
-                      : "text-muted-foreground hover:text-foreground border-b-2 border-transparent"
-                  }`}
-                >
-                  {diff.label}
-                </button>
-              ))}
-            </div>
-          </div>
+            <div className="flex flex-col gap-8">
+              <div className="grid grid-cols-[auto_1fr] items-baseline gap-3">
+                <p className="whitespace-nowrap text-5xl tracking-[0.08em] text-white">Жизни</p>
+                <div className="flex flex-wrap gap-8">
+                  {[1, 3, 5].map((num) => (
+                    <button
+                      key={num}
+                      onClick={() => setCustom({ lives: num })}
+                      className={`text-4xl ${optionClass(isCustom && customSettings.lives === num)}`}
+                    >
+                      {num}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-          {/* Input Method Selection */}
-          <div>
-            <p className="text-base text-muted-foreground mb-2 uppercase tracking-widest">
-              Способ ввода
-            </p>
-            <div className="flex gap-2">
-              {[
-                { id: "type", label: "Вручную" },
-                { id: "select", label: "Из списка" },
-              ].map((method) => (
-                <button
-                  key={method.id}
-                  onClick={() => {
-                    setSelectedMode("custom")
-                    setCustomSettings((prev) => ({ ...prev, inputMethod: method.id }))
-                  }}
-                  className={`px-4 py-2 text-xl font-display transition-all duration-200 tracking-wide ${
-                    selectedMode === "custom" && customSettings.inputMethod === method.id
-                      ? "text-foreground border-b-2 border-foreground"
-                      : "text-muted-foreground hover:text-foreground border-b-2 border-transparent"
-                  }`}
-                >
-                  {method.label}
-                </button>
-              ))}
+              <div className="grid grid-cols-[auto_1fr] items-baseline gap-3">
+                <p className="whitespace-nowrap text-5xl tracking-[0.08em] text-white">Способ ввода</p>
+                <div className="flex flex-wrap gap-8">
+                  {inputMethodChoices.map((method) => (
+                    <button
+                      key={method.id}
+                      onClick={() => setCustom({ inputMethod: method.id })}
+                      className={`text-4xl ${optionClass(isCustom && customSettings.inputMethod === method.id)}`}
+                    >
+                      {method.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-[auto_1fr] items-baseline gap-3">
+                <p className="whitespace-nowrap text-5xl tracking-[0.08em] text-white">Подсказки</p>
+                <div className="flex flex-wrap gap-8">
+                  {difficultyChoices.map((diff) => (
+                    <button
+                      key={diff.id}
+                      onClick={() => setCustom({ difficulty: diff.id })}
+                      className={`text-4xl ${optionClass(isCustom && customSettings.difficulty === diff.id)}`}
+                    >
+                      {diff.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
+          </section>
+        </div>
+
+        <div className="pointer-events-none fixed bottom-10 right-14">
+          <Link href={gameUrl} className={actionButtonClass}>
+            Начать
+          </Link>
         </div>
       </div>
-
-      {/* Divider */}
-      <div className="w-48 h-px bg-foreground/20 mb-10" />
-
-      {/* Start Button */}
-      <Link
-        href={gameUrl}
-        className="text-3xl md:text-5xl font-display tracking-widest text-foreground hover:text-foreground/80 transition-all duration-200 uppercase"
-      >
-        Начать игру
-      </Link>
     </main>
   )
 }
