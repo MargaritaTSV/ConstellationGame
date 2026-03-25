@@ -3,27 +3,57 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <random>
+#include <regex>
+#include <stdexcept>
 
 using json = nlohmann::json;
 
-void ConstellationGraph::LoadFromJson(const std::string& path) {
+void ConstellationGraph::LoadFromPythonGraph(const std::string& path) {
   std::ifstream file(path);
-  json j;
-  file >> j;
+  if (!file.is_open()) {
+    throw std::runtime_error("Failed to open graph file: " + path);
+  }
+
+  short_to_id_.clear();
+  short_names_.clear();
+  full_names_.clear();
+  adj_.clear();
+
+  std::vector<std::pair<std::string, std::vector<std::string>>> parsed_rows;
+  std::string line;
+  std::regex row_pattern(R"(^([A-Za-z]{3})\s*=\s*\[(.*)\]\s*$)");
+  std::regex neighbor_pattern(R"('([^']+)')");
+  std::smatch row_match;
 
   int id = 0;
 
-  for (auto& [name, _] : j.items()) {
+  while (std::getline(file, line)) {
+    if (!std::regex_match(line, row_match, row_pattern)) {
+      continue;
+    }
+
+    const std::string name = row_match[1].str();
+    const std::string raw_neighbors = row_match[2].str();
+
+    std::vector<std::string> neighbors;
+    for (std::sregex_iterator it(raw_neighbors.begin(), raw_neighbors.end(),
+                                 neighbor_pattern),
+                              end;
+         it != end; ++it) {
+      neighbors.push_back((*it)[1].str());
+    }
+
     short_to_id_[name] = id++;
     short_names_.push_back(name);
+    parsed_rows.push_back({name, neighbors});
   }
 
   adj_.resize(short_names_.size());
 
-  for (auto& [name, neighbors] : j.items()) {
+  for (const auto& [name, neighbors] : parsed_rows) {
     int from = short_to_id_[name];
 
-    for (auto& n : neighbors) {
+    for (const auto& n : neighbors) {
       adj_[from].push_back(short_to_id_[n]);
     }
   }
@@ -31,12 +61,20 @@ void ConstellationGraph::LoadFromJson(const std::string& path) {
 
 void ConstellationGraph::LoadNames(const std::string& path) {
   std::ifstream file(path);
+  if (!file.is_open()) {
+    throw std::runtime_error("Failed to open names file: " + path);
+  }
+
   json j;
   file >> j;
 
   full_names_.resize(short_names_.size());
 
   for (auto& [short_name, full_name] : j.items()) {
+    if (!short_to_id_.count(short_name)) {
+      continue;
+    }
+
     int id = short_to_id_[short_name];
     full_names_[id] = full_name;
   }

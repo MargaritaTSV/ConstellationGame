@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "generate:constellations": "node scripts/generate-constellations-data.cjs",
+    "predev": "npm run generate:constellations",
+    "prebuild": "npm run generate:constellations",
+    "prestart": "npm run generate:constellations",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
