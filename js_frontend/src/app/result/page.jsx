@@ -15,33 +15,42 @@ function ResultContent() {
   const isWon = result === "won"
 
   return (
-    <main className="min-h-screen bg-background flex flex-col items-center justify-center px-4 py-8">
-      {/* Start and Target - bigger */}
-      <div className="w-full max-w-3xl flex justify-between items-start mb-12">
+    <main 
+      className="min-h-screen w-full flex flex-col items-center justify-center px-8 py-8"
+      style={{
+        backgroundImage: "url('/bg-stars.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        minHeight: "100vh",
+      }}
+    >
+      {/* Start and Target */}
+      <div className="w-full max-w-4xl flex justify-between items-start mb-12">
         <div className="text-left">
-          <p className="text-base uppercase tracking-widest text-muted-foreground mb-2">Старт</p>
-          <p className="text-3xl md:text-4xl font-display text-foreground tracking-wide">{start}</p>
+          <p className="text-[40px] text-white/60 tracking-wide mb-2">Старт</p>
+          <p className="text-[70px] text-white tracking-wide">{start}</p>
         </div>
         <div className="text-right">
-          <p className="text-base uppercase tracking-widest text-muted-foreground mb-2">Финиш</p>
-          <p className="text-3xl md:text-4xl font-display text-foreground tracking-wide">{target}</p>
+          <p className="text-[40px] text-white/60 tracking-wide mb-2">Финиш</p>
+          <p className="text-[70px] text-white tracking-wide">{target}</p>
         </div>
       </div>
 
       {/* Result */}
       <div className="text-center mb-8">
-        <h1 className="text-5xl md:text-6xl font-display tracking-widest text-foreground mb-4 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
-          {isWon ? "ПОБЕДА" : "ПОРАЖЕНИЕ"}
+        <h1 className="text-[135px] text-white tracking-wide mb-4">
+          {isWon ? "Победа" : "Поражение"}
         </h1>
-        <div className="w-24 h-px bg-foreground/30 mx-auto mb-4" />
-        <p className="text-muted-foreground text-lg tracking-wide">{reason}</p>
+        <div className="w-24 h-px bg-white/30 mx-auto mb-4" />
+        <p className="text-[40px] text-white/60 tracking-wide">{reason}</p>
       </div>
 
       {/* Star map placeholder */}
-      <div className="w-full max-w-xl aspect-video border border-foreground/20 flex items-center justify-center mb-12 relative overflow-hidden">
+      <div className="w-full max-w-2xl aspect-video border border-white/20 flex items-center justify-center mb-12 relative overflow-hidden">
         {/* Starry background effect */}
-        <div className="absolute inset-0 bg-gradient-to-b from-background to-muted/20">
-          {/* Decorative stars - fixed positions to avoid hydration mismatch */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/5">
+          {/* Decorative stars */}
           {[
             { top: 10, left: 15, opacity: 0.4 },
             { top: 25, left: 80, opacity: 0.6 },
@@ -66,7 +75,7 @@ function ResultContent() {
           ].map((star, i) => (
             <div
               key={i}
-              className="absolute w-1 h-1 bg-foreground/40 rounded-full"
+              className="absolute w-1 h-1 bg-white/40 rounded-full"
               style={{
                 top: `${star.top}%`,
                 left: `${star.left}%`,
@@ -75,18 +84,18 @@ function ResultContent() {
             />
           ))}
         </div>
-        <p className="text-muted-foreground text-sm uppercase tracking-widest z-10">
+        <p className="text-[35px] text-white/40 tracking-wide z-10">
           Визуализация маршрута
         </p>
       </div>
 
       {/* Divider */}
-      <div className="w-32 h-px bg-foreground/20 mb-8" />
+      <div className="w-32 h-px bg-white/20 mb-8" />
 
-      {/* Single action - На главную */}
+      {/* Back to main */}
       <Link
         href="/"
-        className="text-3xl md:text-4xl font-display tracking-widest text-foreground hover:text-foreground/80 transition-all duration-200 uppercase"
+        className="text-[80px] text-white hover:text-white/80 transition-colors tracking-wide"
       >
         На главную
       </Link>
@@ -98,8 +107,15 @@ export default function ResultPage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen bg-background flex items-center justify-center">
-          <p className="text-muted-foreground">Загрузка...</p>
+        <main 
+          className="min-h-screen w-full flex items-center justify-center"
+          style={{
+            backgroundImage: "url('/bg-stars.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
+          <p className="text-[50px] text-white/60 tracking-wide">Загрузка...</p>
         </main>
       }
     >

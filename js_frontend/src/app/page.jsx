@@ -2,33 +2,38 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 export default function HomePage() {
-  const [selectedMode, setSelectedMode] = useState("normal")
+  const router = useRouter()
+  const [selectedMode, setSelectedMode] = useState("medium")
   const [customSettings, setCustomSettings] = useState({
     lives: 3,
-    difficulty: "medium",
     inputMethod: "type",
+    hints: true,
   })
+  const [showLogin, setShowLogin] = useState(false)
+  const [loginData, setLoginData] = useState({ username: "", password: "" })
+  const [playerName, setPlayerName] = useState("Имя игрока")
 
   const presetModes = [
-    { id: "easy", label: "Лёгкий", description: "Модель играет просто" },
-    { id: "normal", label: "Обычный", description: "Модель играет средне" },
-    { id: "hard", label: "Сложный", description: "Модель играет на максимуме" },
+    { id: "easy", label: "Лёгкий", description: "5 жизней, подсказки" },
+    { id: "medium", label: "Средний", description: "3 жизни, подсказки" },
+    { id: "hard", label: "Сложный", description: "1 жизнь" },
   ]
 
   const getGameSettings = () => {
     if (selectedMode === "custom") {
       return {
         lives: customSettings.lives,
-        difficulty: customSettings.difficulty,
+        difficulty: customSettings.hints ? "easy" : "medium",
         inputMethod: customSettings.inputMethod,
       }
     }
     
     const presets = {
       easy: { lives: 5, difficulty: "easy", inputMethod: "type" },
-      normal: { lives: 3, difficulty: "medium", inputMethod: "type" },
+      medium: { lives: 3, difficulty: "easy", inputMethod: "type" },
       hard: { lives: 1, difficulty: "hard", inputMethod: "type" },
     }
     return presets[selectedMode]
@@ -37,82 +42,144 @@ export default function HomePage() {
   const settings = getGameSettings()
   const gameUrl = `/game?lives=${settings.lives}&difficulty=${settings.difficulty}&inputMethod=${settings.inputMethod}`
 
+  const handleLogin = (e) => {
+    e.preventDefault()
+    if (loginData.username.trim()) {
+      setPlayerName(loginData.username)
+      router.push("/profile")
+    }
+    setShowLogin(false)
+  }
+
   return (
-    <main className="min-h-screen bg-background flex flex-col items-center justify-center px-4 py-8">
-      {/* Rules button - top right with padding */}
-      <Link
-        href="/rules"
-        className="fixed top-6 right-8 text-2xl font-display text-muted-foreground hover:text-foreground transition-all duration-200 uppercase tracking-widest z-50"
-      >
-        Правила
-      </Link>
+    <main 
+      className="min-h-screen w-full flex flex-col relative overflow-hidden"
+      style={{
+        backgroundImage: "url('/bg-stars.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        aspectRatio: "1910/820",
+        minHeight: "100vh",
+      }}
+    >
+      {/* Login Modal */}
+      {showLogin && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100]">
+          <div className="bg-[#0a1628]/95 border border-white/10 p-8 max-w-md w-full mx-4">
+            <h2 className="text-[50px] text-white text-center mb-6 tracking-wide">Вход</h2>
+            <form onSubmit={handleLogin} className="flex flex-col gap-4">
+              <input
+                type="text"
+                placeholder="Логин"
+                value={loginData.username}
+                onChange={(e) => setLoginData(prev => ({ ...prev, username: e.target.value }))}
+                className="bg-transparent border-b border-white/30 text-white text-[28px] py-2 px-1 tracking-wide placeholder:text-white/40 focus:outline-none focus:border-white/60 transition-colors"
+              />
+              <input
+                type="password"
+                placeholder="Пароль"
+                value={loginData.password}
+                onChange={(e) => setLoginData(prev => ({ ...prev, password: e.target.value }))}
+                className="bg-transparent border-b border-white/30 text-white text-[28px] py-2 px-1 tracking-wide placeholder:text-white/40 focus:outline-none focus:border-white/60 transition-colors"
+              />
+              <div className="flex justify-between mt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowLogin(false)}
+                  className="text-[28px] text-white/60 hover:text-white transition-colors tracking-wide"
+                >
+                  Отмена
+                </button>
+                <button
+                  type="submit"
+                  className="text-[28px] text-white hover:text-white/80 transition-colors tracking-wide"
+                >
+                  Войти
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
-      {/* Header */}
-      <header className="text-center mb-12">
-        <h1 className="text-5xl md:text-7xl font-display tracking-widest text-foreground mb-4 drop-shadow-[0_0_20px_rgba(255,255,255,0.4)]">
-          СОЗВЕЗДИЯ
+      {/* Header Row */}
+      <div className="flex justify-between items-start px-8 py-6">
+        {/* Player Name - clickable */}
+        <button
+          onClick={() => setShowLogin(true)}
+          className="text-[40px] text-white/80 hover:text-white transition-colors tracking-wide"
+        >
+          *{playerName}*
+        </button>
+
+        {/* Title */}
+        <h1 className="text-[135px] text-white tracking-wide leading-none">
+          Созвездия
         </h1>
-        <div className="w-20 h-px bg-foreground/30 mx-auto mb-4" />
-        <p className="text-muted-foreground text-lg tracking-wide">
-          Путешествие по звёздному небу
-        </p>
-      </header>
 
-      {/* Mode Selection */}
-      <div className="w-full max-w-3xl flex flex-col md:flex-row gap-8 md:gap-12 mb-12">
-        {/* Left: Preset Modes */}
-        <div className="flex-1">
-          <h2 className="text-base uppercase tracking-widest text-muted-foreground mb-4">
-            Режим игры
+        {/* Rules Link */}
+        <Link
+          href="/rules"
+          className="text-[40px] text-white/80 hover:text-white transition-colors tracking-wide"
+        >
+          Правила
+        </Link>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex px-8 pb-8">
+        {/* Left Column - Game Mode */}
+        <div className="flex-1 flex flex-col">
+          <h2 className="text-[80px] text-white/90 tracking-wide mb-4 italic">
+            Режим Игры
           </h2>
-          <div className="w-full h-px bg-foreground/20 mb-4" />
           
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2">
             {presetModes.map((mode) => (
               <button
                 key={mode.id}
                 onClick={() => setSelectedMode(mode.id)}
-                className={`text-left py-2 transition-all duration-200 group ${
+                className={`text-left transition-all duration-200 flex items-baseline gap-3 group ${
                   selectedMode === mode.id
-                    ? "text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "text-white"
+                    : "text-white/60 hover:text-white/80"
                 }`}
               >
-                <span className="text-2xl md:text-3xl font-display tracking-wide uppercase">
-                  {selectedMode === mode.id && "> "}
+                <span className="text-[70px] tracking-wide uppercase">
+                  {selectedMode === mode.id && (
+                    <span className="inline-block mr-2 transform -rotate-90">&gt;</span>
+                  )}
                   {mode.label}
                 </span>
-                <p className="text-base text-muted-foreground mt-1 tracking-wide">
+                <span className="text-[40px] text-white/50 tracking-wide">
                   {mode.description}
-                </p>
+                </span>
               </button>
             ))}
           </div>
         </div>
 
-        {/* Right: Custom Settings */}
-        <div className="flex-1">
+        {/* Right Column - Custom Settings */}
+        <div className="flex-1 flex flex-col items-end">
           <button
             onClick={() => setSelectedMode("custom")}
-            className={`text-left py-2 transition-all duration-200 mb-2 w-full ${
+            className={`text-[80px] tracking-wide mb-4 italic transition-colors text-right ${
               selectedMode === "custom"
-                ? "text-foreground"
-                : "text-muted-foreground hover:text-foreground"
+                ? "text-white"
+                : "text-white/90 hover:text-white"
             }`}
           >
-            <span className="text-base uppercase tracking-widest">
-              {selectedMode === "custom" && "> "}
-              Индивидуальная настройка
-            </span>
+            {selectedMode === "custom" && (
+              <span className="inline-block mr-2 transform -rotate-90">&gt;</span>
+            )}
+            Индивидуальная Настройка
           </button>
-          <div className="w-full h-px bg-foreground/20 mb-4" />
 
           {/* Lives Selection */}
-          <div className="mb-4">
-            <p className="text-base text-muted-foreground mb-2 uppercase tracking-widest">
-              Жизни
-            </p>
-            <div className="flex gap-2">
+          <div className="flex items-baseline gap-6 mb-4">
+            <span className="text-[70px] text-white/90 tracking-wide">Жизни</span>
+            <div className="flex gap-4">
               {[1, 3, 5].map((num) => (
                 <button
                   key={num}
@@ -120,10 +187,10 @@ export default function HomePage() {
                     setSelectedMode("custom")
                     setCustomSettings((prev) => ({ ...prev, lives: num }))
                   }}
-                  className={`px-5 py-2 text-2xl font-display transition-all duration-200 tracking-wide ${
+                  className={`text-[70px] tracking-wide transition-all duration-200 ${
                     selectedMode === "custom" && customSettings.lives === num
-                      ? "text-foreground border-b-2 border-foreground"
-                      : "text-muted-foreground hover:text-foreground border-b-2 border-transparent"
+                      ? "text-white"
+                      : "text-white/40 hover:text-white/70"
                   }`}
                 >
                   {num}
@@ -132,44 +199,13 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Difficulty Selection */}
-          <div className="mb-4">
-            <p className="text-base text-muted-foreground mb-2 uppercase tracking-widest">
-              Мастерство модели
-            </p>
-            <div className="flex gap-2">
-              {[
-                { id: "easy", label: "Легко" },
-                { id: "medium", label: "Средне" },
-                { id: "hard", label: "Сложно" },
-              ].map((diff) => (
-                <button
-                  key={diff.id}
-                  onClick={() => {
-                    setSelectedMode("custom")
-                    setCustomSettings((prev) => ({ ...prev, difficulty: diff.id }))
-                  }}
-                  className={`px-4 py-2 text-xl font-display transition-all duration-200 tracking-wide ${
-                    selectedMode === "custom" && customSettings.difficulty === diff.id
-                      ? "text-foreground border-b-2 border-foreground"
-                      : "text-muted-foreground hover:text-foreground border-b-2 border-transparent"
-                  }`}
-                >
-                  {diff.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* Input Method Selection */}
-          <div>
-            <p className="text-base text-muted-foreground mb-2 uppercase tracking-widest">
-              Способ ввода
-            </p>
-            <div className="flex gap-2">
+          <div className="flex items-baseline gap-4 mb-4">
+            <span className="text-[70px] text-white/90 tracking-wide">Способ ввода</span>
+            <div className="flex gap-4">
               {[
-                { id: "type", label: "Вручную" },
-                { id: "select", label: "Из списка" },
+                { id: "type", label: "вручную" },
+                { id: "select", label: "из списка" },
               ].map((method) => (
                 <button
                   key={method.id}
@@ -177,10 +213,10 @@ export default function HomePage() {
                     setSelectedMode("custom")
                     setCustomSettings((prev) => ({ ...prev, inputMethod: method.id }))
                   }}
-                  className={`px-4 py-2 text-xl font-display transition-all duration-200 tracking-wide ${
+                  className={`text-[70px] tracking-wide transition-all duration-200 ${
                     selectedMode === "custom" && customSettings.inputMethod === method.id
-                      ? "text-foreground border-b-2 border-foreground"
-                      : "text-muted-foreground hover:text-foreground border-b-2 border-transparent"
+                      ? "text-white"
+                      : "text-white/40 hover:text-white/70"
                   }`}
                 >
                   {method.label}
@@ -188,19 +224,44 @@ export default function HomePage() {
               ))}
             </div>
           </div>
+
+          {/* Hints Selection */}
+          <div className="flex items-baseline gap-4">
+            <span className="text-[70px] text-white/90 tracking-wide">Подсказки</span>
+            <div className="flex gap-4">
+              {[
+                { value: true, label: "да" },
+                { value: false, label: "нет" },
+              ].map((option) => (
+                <button
+                  key={String(option.value)}
+                  onClick={() => {
+                    setSelectedMode("custom")
+                    setCustomSettings((prev) => ({ ...prev, hints: option.value }))
+                  }}
+                  className={`text-[70px] tracking-wide transition-all duration-200 ${
+                    selectedMode === "custom" && customSettings.hints === option.value
+                      ? "text-white"
+                      : "text-white/40 hover:text-white/70"
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Divider */}
-      <div className="w-48 h-px bg-foreground/20 mb-10" />
-
-      {/* Start Button */}
-      <Link
-        href={gameUrl}
-        className="text-3xl md:text-5xl font-display tracking-widest text-foreground hover:text-foreground/80 transition-all duration-200 uppercase"
-      >
-        Начать игру
-      </Link>
+      {/* Start Button - Bottom Right */}
+      <div className="absolute bottom-8 right-8">
+        <Link
+          href={gameUrl}
+          className="text-[80px] text-white hover:text-white/80 transition-colors tracking-wide uppercase"
+        >
+          Начать
+        </Link>
+      </div>
     </main>
   )
 }

@@ -26,7 +26,7 @@ const allConstellations = [
   "Южный Крест", "Южный Треугольник", "Ящерица"
 ]
 
-// Mock constellation data with neighbors
+// Constellation data with neighbors
 const constellations = {
   "Большая Медведица": ["Малая Медведица", "Дракон", "Волопас", "Гончие Псы"],
   "Малая Медведица": ["Большая Медведица", "Дракон", "Цефей", "Жираф"],
@@ -92,7 +92,29 @@ function getTargetConstellation(start) {
   return target
 }
 
-// Grid-based constellation background - avoids overlapping and excluded zones
+// Star Spinner Component
+function StarSpinner() {
+  return (
+    <div className="relative w-10 h-10 flex items-center justify-center">
+      {/* Orbit circle */}
+      <div className="absolute w-8 h-8 border border-white/20 rounded-full" />
+      {/* Star orbiting */}
+      <div className="star-spinner">
+        <svg 
+          width="12" 
+          height="12" 
+          viewBox="0 0 24 24" 
+          fill="white" 
+          className="drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]"
+        >
+          <polygon points="12,2 15,9 22,9 16,14 18,22 12,17 6,22 8,14 2,9 9,9" />
+        </svg>
+      </div>
+    </div>
+  )
+}
+
+// Grid-based constellation background
 function ConstellationBackground({ 
   usedConstellations, 
   onSelect, 
@@ -100,32 +122,18 @@ function ConstellationBackground({
   showUsed
 }) {
   const gridPositions = useMemo(() => {
-    // Create a grid layout that avoids center and corners
-    // Excluded zones: top-left (lives), top-right (rules), bottom-left (lives label), 
-    // bottom-right (end button), center (main UI)
-    
     const positions = []
-    const cols = 8 // 8 columns
-    const rows = 11 // 11 rows to fit all 88 constellations
-    
-    // Zones to avoid (in grid coordinates)
-    // Top bar: row 0-1, col 0-1 and col 6-7
-    // Bottom bar: row 9-10, col 0-2 and col 5-7
-    // Center: row 3-7, col 2-5
+    const cols = 8
+    const rows = 11
     
     const isExcluded = (col, row) => {
-      // Top left corner (rules area)
       if (row <= 1 && col >= 6) return true
-      // Bottom left (lives)
       if (row >= 9 && col <= 2) return true
-      // Bottom right (end button)
       if (row >= 9 && col >= 5) return true
-      // Center area (main UI)
       if (row >= 2 && row <= 8 && col >= 2 && col <= 5) return true
       return false
     }
     
-    // Seed-based pseudo-random for consistent positions
     const seed = 54321
     const random = (i) => {
       const x = Math.sin(seed + i * 7777) * 10000
@@ -146,7 +154,6 @@ function ConstellationBackground({
       }
     }
     
-    // If we still have constellations left, fill remaining spots
     while (positions.length < allConstellations.length) {
       const i = positions.length
       positions.push({
@@ -166,7 +173,6 @@ function ConstellationBackground({
           const isUsed = usedConstellations.has(name)
           const pos = gridPositions[i]
           
-          // Calculate position based on grid
           const left = `${(pos.col / 7) * 90 + 5}%`
           const top = `${(pos.row / 10) * 90 + 5}%`
           
@@ -179,12 +185,12 @@ function ConstellationBackground({
                 }
               }}
               disabled={!isPlayerTurn || isUsed}
-              className={`absolute text-base md:text-lg font-bold transition-all duration-300 pointer-events-auto whitespace-nowrap tracking-[0.1em] ${
+              className={`absolute text-[24px] transition-all duration-300 pointer-events-auto whitespace-nowrap tracking-wide ${
                 isUsed && showUsed
                   ? "text-amber-500/50"
                   : isUsed
-                  ? "text-muted-foreground/20"
-                  : "text-muted-foreground/30 hover:text-muted-foreground/60 cursor-pointer"
+                  ? "text-white/20"
+                  : "text-white/30 hover:text-white/60 cursor-pointer"
               }`}
               style={{
                 left,
@@ -215,6 +221,7 @@ function GameContent() {
   const [gameState, setGameState] = useState(null)
   const [autocomplete, setAutocomplete] = useState(null)
   const [checkResult, setCheckResult] = useState(null)
+  const [isAiThinking, setIsAiThinking] = useState(false)
 
   // Initialize game
   useEffect(() => {
@@ -236,7 +243,7 @@ function GameContent() {
     })
   }, [lives, difficulty, inputMethod])
 
-  // Autocomplete logic - works for any constellation
+  // Autocomplete logic - works for ANY constellation from all 88
   useEffect(() => {
     if (!input.trim() || !gameState) {
       setAutocomplete(null)
@@ -244,10 +251,12 @@ function GameContent() {
     }
     
     const inputLower = input.toLowerCase()
+    // Search through ALL 88 constellations, not just unused ones
     const matches = allConstellations.filter(c => 
-      c.toLowerCase().startsWith(inputLower) && !gameState.usedConstellations.has(c)
+      c.toLowerCase().startsWith(inputLower)
     )
     
+    // Only show autocomplete when there's exactly one match
     if (matches.length === 1 && matches[0].toLowerCase() !== inputLower) {
       setAutocomplete(matches[0])
     } else {
@@ -290,10 +299,12 @@ function GameContent() {
   }, [gameState, input])
 
   const makeAIMove = useCallback((state) => {
+    setIsAiThinking(true)
     setTimeout(() => {
       const validMoves = getValidMoves(state.currentConstellation, state.usedConstellations)
       
       if (validMoves.length === 0) {
+        setIsAiThinking(false)
         setGameState((prev) => prev ? {
           ...prev,
           gameStatus: "won",
@@ -305,15 +316,12 @@ function GameContent() {
       let aiMove
 
       if (state.difficulty === "easy") {
-        // Easy: random choice
         aiMove = validMoves[Math.floor(Math.random() * validMoves.length)]
       } else if (state.difficulty === "hard") {
-        // Hard: try to reach target or block player
         const moveToTarget = validMoves.find(m => m === state.targetConstellation)
         if (moveToTarget) {
           aiMove = moveToTarget
         } else {
-          // Choose move that leads closer to target or limits player options
           aiMove = validMoves.reduce((best, move) => {
             const newUsed = new Set(state.usedConstellations)
             newUsed.add(move)
@@ -325,7 +333,6 @@ function GameContent() {
           }, validMoves[0])
         }
       } else {
-        // Medium: 50/50 smart vs random
         if (Math.random() > 0.5) {
           const moveToTarget = validMoves.find(m => m === state.targetConstellation)
           aiMove = moveToTarget || validMoves[Math.floor(Math.random() * validMoves.length)]
@@ -336,6 +343,8 @@ function GameContent() {
 
       const newUsed = new Set(state.usedConstellations)
       newUsed.add(aiMove)
+
+      setIsAiThinking(false)
 
       if (aiMove === state.targetConstellation) {
         setGameState((prev) => prev ? {
@@ -355,7 +364,7 @@ function GameContent() {
           isPlayerTurn: true,
         } : null)
       }
-    }, 1000)
+    }, 1500)
   }, [getValidMoves])
 
   const submitMove = useCallback((guess) => {
@@ -475,8 +484,15 @@ function GameContent() {
 
   if (!gameState) {
     return (
-      <main className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground text-2xl tracking-[0.15em]">Загрузка...</p>
+      <main 
+        className="min-h-screen w-full flex items-center justify-center"
+        style={{
+          backgroundImage: "url('/bg-stars.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        <p className="text-[50px] text-white/60 tracking-wide">Загрузка...</p>
       </main>
     )
   }
@@ -485,19 +501,25 @@ function GameContent() {
   const showNeighbors = gameState.difficulty === "easy"
   const showSelectBackground = inputMethod === "select"
 
-  // Build return URL preserving game state
   const gameParams = `lives=${lives}&difficulty=${difficulty}&inputMethod=${inputMethod}`
   const returnUrl = `/game?${gameParams}`
 
   return (
     <main
-      className={`min-h-screen bg-background flex flex-col items-center justify-center px-4 py-8 transition-colors duration-300 relative ${
+      className={`min-h-screen w-full flex flex-col items-center justify-center px-8 py-8 transition-colors duration-300 relative ${
         feedback === "success"
           ? "bg-green-950/30"
           : feedback === "error"
           ? "bg-red-950/30"
           : ""
       }`}
+      style={{
+        backgroundImage: "url('/bg-stars.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        minHeight: "100vh",
+      }}
     >
       {/* Constellation background for select mode */}
       {showSelectBackground && (
@@ -509,47 +531,61 @@ function GameContent() {
         />
       )}
 
-      {/* Rules button - top right with padding */}
+      {/* Rules button - top right */}
       <Link
         href={`/rules?returnTo=${encodeURIComponent(returnUrl)}`}
-        className="fixed top-6 right-8 text-2xl font-display text-muted-foreground hover:text-foreground transition-all duration-200 uppercase tracking-widest z-50"
+        className="fixed top-6 right-8 text-[40px] text-white/80 hover:text-white transition-colors tracking-wide z-50"
       >
         Правила
       </Link>
 
-      {/* Header with start and target - at edges and bigger */}
+      {/* Header with start and target */}
       <div className="w-full max-w-4xl flex justify-between items-start mb-8 px-2 relative z-10">
         <div className="text-left">
-          <p className="text-base uppercase tracking-widest text-muted-foreground mb-1">Старт</p>
-          <p className="text-4xl md:text-5xl font-display text-foreground tracking-wide">{gameState.startConstellation}</p>
+          <p className="text-[35px] text-white/60 tracking-wide mb-1">Старт</p>
+          <p className="text-[70px] text-white tracking-wide">{gameState.startConstellation}</p>
         </div>
         <div className="text-right">
-          <p className="text-base uppercase tracking-widest text-muted-foreground mb-1">Финиш</p>
-          <p className="text-4xl md:text-5xl font-display text-foreground tracking-wide">{gameState.targetConstellation}</p>
+          <p className="text-[35px] text-white/60 tracking-wide mb-1">Финиш</p>
+          <p className="text-[70px] text-white tracking-wide">{gameState.targetConstellation}</p>
         </div>
       </div>
 
       {/* Current constellation */}
       <div className="text-center mb-6 relative z-10">
-        <p className="text-base uppercase tracking-widest text-muted-foreground mb-2">
+        <p className="text-[35px] text-white/60 tracking-wide mb-2">
           Текущее созвездие
         </p>
-        <p className="text-5xl md:text-6xl font-display text-foreground tracking-wide drop-shadow-[0_0_20px_rgba(255,255,255,0.4)]">
+        <p className="text-[100px] text-white tracking-wide">
           {gameState.currentConstellation}
         </p>
       </div>
 
       {/* Divider */}
-      <div className="w-24 h-px bg-foreground/20 mb-6 relative z-10" />
+      <div className="w-24 h-px bg-white/20 mb-6 relative z-10" />
 
-      {/* Turn indicator */}
-      <p className="text-2xl text-muted-foreground mb-3 relative z-10 tracking-[0.15em]">
-        {gameState.isPlayerTurn ? "Ваш ход" : "Ход ИИ..."}
-      </p>
+      {/* Turn indicator with star spinner */}
+      <div className="flex items-center gap-4 mb-4 relative z-10">
+        <p className="text-[50px] text-white/80 tracking-wide">
+          {gameState.isPlayerTurn ? "Ваш ход" : "Ход ИИ..."}
+        </p>
+        {isAiThinking && <StarSpinner />}
+      </div>
 
-      {/* Input with autocomplete */}
-      <form onSubmit={handleSubmit} className="w-full max-w-sm mb-4 relative z-10">
+      {/* Input with inline autocomplete */}
+      <form onSubmit={handleSubmit} className="w-full max-w-lg mb-4 relative z-10">
         <div className="relative">
+          {/* Autocomplete suggestion displayed inline */}
+          {autocomplete && (
+            <div className="absolute inset-0 flex items-center pointer-events-none">
+              <span className="text-[45px] text-transparent tracking-wide">
+                {input}
+              </span>
+              <span className="text-[45px] text-white/30 tracking-wide">
+                {autocomplete.slice(input.length)}
+              </span>
+            </div>
+          )}
           <input
             ref={inputRef}
             type="text"
@@ -558,18 +594,11 @@ function GameContent() {
             onKeyDown={handleKeyDown}
             placeholder="Введите созвездие..."
             disabled={!gameState.isPlayerTurn || gameState.gameStatus !== "playing"}
-            className="w-full bg-transparent border-b-2 border-foreground/30 text-foreground text-center text-2xl py-2 font-bold tracking-[0.1em] placeholder:text-muted-foreground focus:outline-none focus:border-foreground transition-colors disabled:opacity-50"
+            className="w-full bg-transparent border-b-2 border-white/30 text-white text-[45px] py-2 tracking-wide placeholder:text-white/30 focus:outline-none focus:border-white/60 transition-colors disabled:opacity-50"
           />
-          {autocomplete && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <span className="text-2xl font-bold text-muted-foreground/50 tracking-[0.1em]">
-                {autocomplete}
-              </span>
-            </div>
-          )}
         </div>
         {autocomplete && (
-          <p className="text-lg text-muted-foreground mt-1 text-center tracking-[0.1em]">
+          <p className="text-[28px] text-white/50 mt-2 tracking-wide">
             Tab для автодополнения
           </p>
         )}
@@ -579,10 +608,10 @@ function GameContent() {
       <button
         onClick={checkIfUsed}
         disabled={!input.trim()}
-        className={`text-lg mb-6 transition-all duration-200 relative z-10 tracking-wide ${
+        className={`text-[35px] mb-6 transition-all duration-200 relative z-10 tracking-wide ${
           checkResult === "used"
             ? "text-amber-500"
-            : "text-muted-foreground hover:text-foreground disabled:opacity-30"
+            : "text-white/60 hover:text-white disabled:opacity-30"
         }`}
       >
         {checkResult === "used" ? "Уже названо" : checkResult === "unused" ? "Ещё не названо" : "Проверить"}
@@ -591,19 +620,19 @@ function GameContent() {
       {/* Hints - available neighbors (only on easy) */}
       {showNeighbors && (
         <div className="mb-8 text-center relative z-10">
-          <p className="text-lg text-muted-foreground mb-2 tracking-[0.15em]">Доступные соседи</p>
-          <div className="flex flex-wrap justify-center gap-2">
+          <p className="text-[35px] text-white/60 mb-2 tracking-wide">Доступные соседи</p>
+          <div className="flex flex-wrap justify-center gap-3">
             {validMoves.map((move) => (
               <button
                 key={move}
                 onClick={() => setInput(move)}
-                className="text-xl text-foreground/70 hover:text-foreground transition-colors tracking-[0.1em]"
+                className="text-[40px] text-white/70 hover:text-white transition-colors tracking-wide"
               >
                 {move}
               </button>
             ))}
             {validMoves.length === 0 && (
-              <p className="text-lg text-muted-foreground tracking-[0.1em]">Нет доступных ходов</p>
+              <p className="text-[35px] text-white/40 tracking-wide">Нет доступных ходов</p>
             )}
           </div>
         </div>
@@ -612,15 +641,15 @@ function GameContent() {
       {/* Hard mode indicator */}
       {gameState.difficulty === "hard" && (
         <div className="mb-8 text-center relative z-10">
-          <p className="text-lg text-muted-foreground/60 tracking-[0.15em]">
+          <p className="text-[30px] text-white/40 tracking-wide">
             ИИ играет с максимальной точностью
           </p>
         </div>
       )}
 
-      {/* Lives - bottom left with label, bigger and with padding */}
+      {/* Lives - bottom left */}
       <div className="fixed bottom-8 left-8 flex flex-col items-start z-50">
-        <p className="text-base text-muted-foreground/60 mb-1 uppercase tracking-[0.15em]">
+        <p className="text-[30px] text-white/60 mb-1 tracking-wide">
           Жизни
         </p>
         <div className="flex gap-2">
@@ -629,18 +658,18 @@ function GameContent() {
               key={i}
               className={`w-4 h-4 rounded-full transition-all duration-200 ${
                 i < gameState.lives
-                  ? "bg-foreground"
-                  : "bg-foreground/20"
+                  ? "bg-white"
+                  : "bg-white/20"
               }`}
             />
           ))}
         </div>
       </div>
 
-      {/* End game button - bottom right with padding */}
+      {/* End game button - bottom right */}
       <button
         onClick={handleEndGame}
-        className="fixed bottom-8 right-8 text-2xl font-display text-muted-foreground hover:text-foreground transition-all duration-200 uppercase tracking-widest z-50"
+        className="fixed bottom-8 right-8 text-[40px] text-white/80 hover:text-white transition-colors tracking-wide z-50"
       >
         Завершить
       </button>
@@ -652,8 +681,15 @@ export default function GamePage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen bg-background flex items-center justify-center">
-          <p className="text-muted-foreground text-2xl tracking-[0.15em]">Загрузка...</p>
+        <main 
+          className="min-h-screen w-full flex items-center justify-center"
+          style={{
+            backgroundImage: "url('/bg-stars.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
+          <p className="text-[50px] text-white/60 tracking-wide">Загрузка...</p>
         </main>
       }
     >
