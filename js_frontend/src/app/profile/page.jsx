@@ -7,24 +7,24 @@ export default function ProfilePage() {
     <main 
       className="min-h-screen w-full flex flex-col items-center justify-center relative"
       style={{
-        backgroundImage: "url('/bg-stars.png')",
+        backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('/bg-stars.png')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
-        minHeight: "100vh",
+        fontFamily: "'Amatic SC', cursive",
       }}
     >
       {/* Header */}
-      <h1 className="text-[135px] text-white tracking-wide mb-8">
+      <h1 className="text-6xl text-white mb-8">
         Личный кабинет
       </h1>
 
       {/* Placeholder content */}
-      <div className="text-center mb-12">
-        <p className="text-[50px] text-white/60 tracking-wide mb-4">
+      <div className="text-center mb-10">
+        <p className="text-3xl text-white/60 mb-4">
           Страница в разработке
         </p>
-        <p className="text-[35px] text-white/40 tracking-wide">
+        <p className="text-2xl text-white/40">
           Здесь будет статистика и настройки профиля
         </p>
       </div>
@@ -32,7 +32,7 @@ export default function ProfilePage() {
       {/* Return Button */}
       <Link
         href="/"
-        className="text-[80px] text-white hover:text-white/80 transition-colors tracking-wide"
+        className="text-4xl text-white hover:text-white/80 transition-colors"
       >
         Перейти к настройке игры
       </Link>

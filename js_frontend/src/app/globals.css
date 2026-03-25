@@ -79,7 +79,7 @@
   --font-amatic: var(--font-amatic), 'Amatic SC', cursive;
   --font-sans: var(--font-amatic), 'Amatic SC', cursive;
   --font-mono: var(--font-amatic), 'Amatic SC', cursive;
-  --tracking-wide: 0.625em;
+  --tracking-wide: 0.05em;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);

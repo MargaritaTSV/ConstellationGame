@@ -95,14 +95,11 @@ function getTargetConstellation(start) {
 // Star Spinner Component
 function StarSpinner() {
   return (
-    <div className="relative w-10 h-10 flex items-center justify-center">
-      {/* Orbit circle */}
-      <div className="absolute w-8 h-8 border border-white/20 rounded-full" />
-      {/* Star orbiting */}
+    <div className="relative w-8 h-8 flex items-center justify-center">
       <div className="star-spinner">
         <svg 
-          width="12" 
-          height="12" 
+          width="10" 
+          height="10" 
           viewBox="0 0 24 24" 
           fill="white" 
           className="drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]"
@@ -185,7 +182,7 @@ function ConstellationBackground({
                 }
               }}
               disabled={!isPlayerTurn || isUsed}
-              className={`absolute text-[24px] transition-all duration-300 pointer-events-auto whitespace-nowrap tracking-wide ${
+              className={`absolute text-lg transition-all duration-300 pointer-events-auto whitespace-nowrap ${
                 isUsed && showUsed
                   ? "text-amber-500/50"
                   : isUsed
@@ -196,6 +193,7 @@ function ConstellationBackground({
                 left,
                 top,
                 transform: `rotate(${pos.rotation}deg)`,
+                fontFamily: "'Amatic SC', cursive",
               }}
             >
               {name}
@@ -251,7 +249,7 @@ function GameContent() {
     }
     
     const inputLower = input.toLowerCase()
-    // Search through ALL 88 constellations, not just unused ones
+    // Search through ALL 88 constellations
     const matches = allConstellations.filter(c => 
       c.toLowerCase().startsWith(inputLower)
     )
@@ -487,12 +485,13 @@ function GameContent() {
       <main 
         className="min-h-screen w-full flex items-center justify-center"
         style={{
-          backgroundImage: "url('/bg-stars.png')",
+          backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('/bg-stars.png')",
           backgroundSize: "cover",
           backgroundPosition: "center",
+          fontFamily: "'Amatic SC', cursive",
         }}
       >
-        <p className="text-[50px] text-white/60 tracking-wide">Загрузка...</p>
+        <p className="text-3xl text-white/60">Загрузка...</p>
       </main>
     )
   }
@@ -514,11 +513,12 @@ function GameContent() {
           : ""
       }`}
       style={{
-        backgroundImage: "url('/bg-stars.png')",
+        backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('/bg-stars.png')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
         minHeight: "100vh",
+        fontFamily: "'Amatic SC', cursive",
       }}
     >
       {/* Constellation background for select mode */}
@@ -534,7 +534,7 @@ function GameContent() {
       {/* Rules button - top right */}
       <Link
         href={`/rules?returnTo=${encodeURIComponent(returnUrl)}`}
-        className="fixed top-6 right-8 text-[40px] text-white/80 hover:text-white transition-colors tracking-wide z-50"
+        className="fixed top-6 right-8 text-2xl text-white/80 hover:text-white transition-colors z-50"
       >
         Правила
       </Link>
@@ -542,21 +542,21 @@ function GameContent() {
       {/* Header with start and target */}
       <div className="w-full max-w-4xl flex justify-between items-start mb-8 px-2 relative z-10">
         <div className="text-left">
-          <p className="text-[35px] text-white/60 tracking-wide mb-1">Старт</p>
-          <p className="text-[70px] text-white tracking-wide">{gameState.startConstellation}</p>
+          <p className="text-xl text-white/60 mb-1">Старт</p>
+          <p className="text-4xl text-white">{gameState.startConstellation}</p>
         </div>
         <div className="text-right">
-          <p className="text-[35px] text-white/60 tracking-wide mb-1">Финиш</p>
-          <p className="text-[70px] text-white tracking-wide">{gameState.targetConstellation}</p>
+          <p className="text-xl text-white/60 mb-1">Финиш</p>
+          <p className="text-4xl text-white">{gameState.targetConstellation}</p>
         </div>
       </div>
 
       {/* Current constellation */}
       <div className="text-center mb-6 relative z-10">
-        <p className="text-[35px] text-white/60 tracking-wide mb-2">
+        <p className="text-xl text-white/60 mb-2">
           Текущее созвездие
         </p>
-        <p className="text-[100px] text-white tracking-wide">
+        <p className="text-6xl text-white">
           {gameState.currentConstellation}
         </p>
       </div>
@@ -565,23 +565,23 @@ function GameContent() {
       <div className="w-24 h-px bg-white/20 mb-6 relative z-10" />
 
       {/* Turn indicator with star spinner */}
-      <div className="flex items-center gap-4 mb-4 relative z-10">
-        <p className="text-[50px] text-white/80 tracking-wide">
+      <div className="flex items-center gap-3 mb-4 relative z-10">
+        <p className="text-3xl text-white/80">
           {gameState.isPlayerTurn ? "Ваш ход" : "Ход ИИ..."}
         </p>
         {isAiThinking && <StarSpinner />}
       </div>
 
-      {/* Input with inline autocomplete */}
-      <form onSubmit={handleSubmit} className="w-full max-w-lg mb-4 relative z-10">
-        <div className="relative">
+      {/* Input with inline autocomplete - CENTERED */}
+      <form onSubmit={handleSubmit} className="w-full max-w-md mb-4 relative z-10">
+        <div className="relative flex justify-center">
           {/* Autocomplete suggestion displayed inline */}
           {autocomplete && (
-            <div className="absolute inset-0 flex items-center pointer-events-none">
-              <span className="text-[45px] text-transparent tracking-wide">
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <span className="text-3xl text-transparent">
                 {input}
               </span>
-              <span className="text-[45px] text-white/30 tracking-wide">
+              <span className="text-3xl text-white/30">
                 {autocomplete.slice(input.length)}
               </span>
             </div>
@@ -594,11 +594,12 @@ function GameContent() {
             onKeyDown={handleKeyDown}
             placeholder="Введите созвездие..."
             disabled={!gameState.isPlayerTurn || gameState.gameStatus !== "playing"}
-            className="w-full bg-transparent border-b-2 border-white/30 text-white text-[45px] py-2 tracking-wide placeholder:text-white/30 focus:outline-none focus:border-white/60 transition-colors disabled:opacity-50"
+            className="w-full bg-transparent border-b-2 border-white/30 text-white text-3xl py-2 text-center placeholder:text-white/30 focus:outline-none focus:border-white/60 transition-colors disabled:opacity-50"
+            style={{ fontFamily: "'Amatic SC', cursive" }}
           />
         </div>
         {autocomplete && (
-          <p className="text-[28px] text-white/50 mt-2 tracking-wide">
+          <p className="text-lg text-white/50 mt-2 text-center">
             Tab для автодополнения
           </p>
         )}
@@ -608,7 +609,7 @@ function GameContent() {
       <button
         onClick={checkIfUsed}
         disabled={!input.trim()}
-        className={`text-[35px] mb-6 transition-all duration-200 relative z-10 tracking-wide ${
+        className={`text-xl mb-6 transition-all duration-200 relative z-10 ${
           checkResult === "used"
             ? "text-amber-500"
             : "text-white/60 hover:text-white disabled:opacity-30"
@@ -620,19 +621,19 @@ function GameContent() {
       {/* Hints - available neighbors (only on easy) */}
       {showNeighbors && (
         <div className="mb-8 text-center relative z-10">
-          <p className="text-[35px] text-white/60 mb-2 tracking-wide">Доступные соседи</p>
+          <p className="text-xl text-white/60 mb-2">Доступные соседи</p>
           <div className="flex flex-wrap justify-center gap-3">
             {validMoves.map((move) => (
               <button
                 key={move}
                 onClick={() => setInput(move)}
-                className="text-[40px] text-white/70 hover:text-white transition-colors tracking-wide"
+                className="text-2xl text-white/70 hover:text-white transition-colors"
               >
                 {move}
               </button>
             ))}
             {validMoves.length === 0 && (
-              <p className="text-[35px] text-white/40 tracking-wide">Нет доступных ходов</p>
+              <p className="text-xl text-white/40">Нет доступных ходов</p>
             )}
           </div>
         </div>
@@ -641,35 +642,23 @@ function GameContent() {
       {/* Hard mode indicator */}
       {gameState.difficulty === "hard" && (
         <div className="mb-8 text-center relative z-10">
-          <p className="text-[30px] text-white/40 tracking-wide">
+          <p className="text-lg text-white/40">
             ИИ играет с максимальной точностью
           </p>
         </div>
       )}
 
-      {/* Lives - bottom left */}
-      <div className="fixed bottom-8 left-8 flex flex-col items-start z-50">
-        <p className="text-[30px] text-white/60 mb-1 tracking-wide">
-          Жизни
+      {/* Lives - bottom left - TEXT ONLY, no circles */}
+      <div className="fixed bottom-6 left-8 z-50">
+        <p className="text-2xl text-white/80">
+          Жизни: {gameState.lives}
         </p>
-        <div className="flex gap-2">
-          {Array.from({ length: gameState.maxLives }).map((_, i) => (
-            <div
-              key={i}
-              className={`w-4 h-4 rounded-full transition-all duration-200 ${
-                i < gameState.lives
-                  ? "bg-white"
-                  : "bg-white/20"
-              }`}
-            />
-          ))}
-        </div>
       </div>
 
       {/* End game button - bottom right */}
       <button
         onClick={handleEndGame}
-        className="fixed bottom-8 right-8 text-[40px] text-white/80 hover:text-white transition-colors tracking-wide z-50"
+        className="fixed bottom-6 right-8 text-2xl text-white/80 hover:text-white transition-colors z-50"
       >
         Завершить
       </button>
@@ -684,12 +673,13 @@ export default function GamePage() {
         <main 
           className="min-h-screen w-full flex items-center justify-center"
           style={{
-            backgroundImage: "url('/bg-stars.png')",
+            backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('/bg-stars.png')",
             backgroundSize: "cover",
             backgroundPosition: "center",
+            fontFamily: "'Amatic SC', cursive",
           }}
         >
-          <p className="text-[50px] text-white/60 tracking-wide">Загрузка...</p>
+          <p className="text-3xl text-white/60">Загрузка...</p>
         </main>
       }
     >

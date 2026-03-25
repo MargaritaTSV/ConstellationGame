@@ -10,76 +10,65 @@ function RulesContent() {
 
   return (
     <main 
-      className="min-h-screen w-full flex flex-col items-center justify-center px-8 py-8 relative"
+      className="min-h-screen w-full flex flex-col px-8 py-6"
       style={{
-        backgroundImage: "url('/bg-stars.png')",
+        backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('/bg-stars.png')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
-        minHeight: "100vh",
+        fontFamily: "'Amatic SC', cursive",
       }}
     >
-      {/* Back button - top right */}
-      <Link
-        href={returnTo || "/"}
-        className="fixed top-6 right-8 text-[40px] text-white/80 hover:text-white transition-colors tracking-wide z-50"
-      >
-        Назад
-      </Link>
+      {/* Header */}
+      <div className="flex justify-between items-start mb-8">
+        <Link
+          href={returnTo || "/"}
+          className="text-2xl text-white/80 hover:text-white transition-colors"
+        >
+          Назад
+        </Link>
+        <h1 className="text-6xl text-white">Правила</h1>
+        <div className="w-16" />
+      </div>
 
-      <header className="text-center mb-10">
-        <h1 className="text-[135px] text-white tracking-wide mb-4">
-          Правила
-        </h1>
-        <div className="w-24 h-px bg-white/30 mx-auto" />
-      </header>
+      {/* Rules Content */}
+      <div className="flex-1 flex flex-col items-center justify-center max-w-3xl mx-auto">
+        <div className="space-y-6 text-white/90">
+          <section>
+            <h2 className="text-4xl text-white mb-3">Цель игры</h2>
+            <p className="text-2xl text-white/70 leading-relaxed">
+              Дойдите от начального созвездия до конечного, перемещаясь 
+              по соседним созвездиям. Первый, кто достигнет цели - побеждает.
+            </p>
+          </section>
 
-      <div className="max-w-3xl text-center flex flex-col gap-8">
-        <section>
-          <h2 className="text-[70px] text-white tracking-wide mb-2">
-            Цель игры
-          </h2>
-          <p className="text-[35px] text-white/70 leading-relaxed tracking-wide">
-            Дойти от начального созвездия до конечного, перемещаясь только по соседним созвездиям.
-            Побеждает тот, кто первым достигнет финишного созвездия.
-          </p>
-        </section>
+          <section>
+            <h2 className="text-4xl text-white mb-3">Как играть</h2>
+            <ul className="text-2xl text-white/70 space-y-2 leading-relaxed">
+              <li>Введите название соседнего созвездия</li>
+              <li>Каждое созвездие можно использовать только один раз</li>
+              <li>Неверный ход отнимает одну жизнь</li>
+              <li>Игра заканчивается, когда кто-то достигает цели или у вас заканчиваются жизни</li>
+            </ul>
+          </section>
 
-        <div className="w-20 h-px bg-white/20 mx-auto" />
+          <section>
+            <h2 className="text-4xl text-white mb-3">Режимы</h2>
+            <ul className="text-2xl text-white/70 space-y-2 leading-relaxed">
+              <li><span className="text-white">Лёгкий</span> - 5 жизней, показываются доступные соседи</li>
+              <li><span className="text-white">Средний</span> - 3 жизни, показываются доступные соседи</li>
+              <li><span className="text-white">Сложный</span> - 1 жизнь, ИИ играет на максимуме</li>
+            </ul>
+          </section>
 
-        <section>
-          <h2 className="text-[70px] text-white tracking-wide mb-2">
-            Ход игры
-          </h2>
-          <p className="text-[35px] text-white/70 leading-relaxed tracking-wide">
-            Вы и ИИ по очереди называете созвездия. Каждое названное созвездие должно быть
-            соседним с текущим и ещё не использованным в этой партии.
-          </p>
-        </section>
-
-        <div className="w-20 h-px bg-white/20 mx-auto" />
-
-        <section>
-          <h2 className="text-[70px] text-white tracking-wide mb-2">
-            Ошибки
-          </h2>
-          <p className="text-[35px] text-white/70 leading-relaxed tracking-wide">
-            При неверном ходе (несоседнее созвездие, уже использованное или несуществующее)
-            вы теряете одну жизнь. Когда жизни заканчиваются — игра проиграна.
-          </p>
-        </section>
-
-        <div className="w-20 h-px bg-white/20 mx-auto" />
-
-        <section>
-          <h2 className="text-[70px] text-white tracking-wide mb-2">
-            Победа и поражение
-          </h2>
-          <p className="text-[35px] text-white/70 leading-relaxed tracking-wide">
-            Игра завершается, когда кто-то достигает конечного созвездия, у одной из сторон
-            не остаётся допустимых ходов, или когда вы решите завершить игру досрочно.
-          </p>
-        </section>
+          <section>
+            <h2 className="text-4xl text-white mb-3">Подсказки</h2>
+            <ul className="text-2xl text-white/70 space-y-2 leading-relaxed">
+              <li>Нажмите Tab для автодополнения названия созвездия</li>
+              <li>Используйте кнопку &quot;Проверить&quot; чтобы узнать, было ли созвездие уже названо</li>
+            </ul>
+          </section>
+        </div>
       </div>
     </main>
   )
@@ -87,18 +76,21 @@ function RulesContent() {
 
 export default function RulesPage() {
   return (
-    <Suspense fallback={
-      <main 
-        className="min-h-screen w-full flex items-center justify-center"
-        style={{
-          backgroundImage: "url('/bg-stars.png')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        <p className="text-[50px] text-white/60 tracking-wide">Загрузка...</p>
-      </main>
-    }>
+    <Suspense
+      fallback={
+        <main 
+          className="min-h-screen w-full flex items-center justify-center"
+          style={{
+            backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('/bg-stars.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            fontFamily: "'Amatic SC', cursive",
+          }}
+        >
+          <p className="text-3xl text-white/60">Загрузка...</p>
+        </main>
+      }
+    >
       <RulesContent />
     </Suspense>
   )
