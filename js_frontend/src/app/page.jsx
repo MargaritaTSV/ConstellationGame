@@ -19,6 +19,12 @@ const inputMethodChoices = [
   { id: "select", label: "из списка" },
 ]
 
+const rulesButtonClass =
+  "fixed top-8 right-14 z-50 text-right text-4xl uppercase tracking-[0.18em] text-zinc-300 transition-colors duration-200 hover:text-white md:text-5xl"
+
+const actionButtonClass =
+  "pointer-events-auto whitespace-nowrap text-right text-5xl uppercase tracking-[0.18em] text-foreground transition-all duration-200 hover:scale-110 hover:text-white md:text-6xl"
+
 export default function HomePage() {
   const [selectedMode, setSelectedMode] = useState("normal")
   const [customSettings, setCustomSettings] = useState({
@@ -50,33 +56,41 @@ export default function HomePage() {
     setCustomSettings((prev) => ({ ...prev, ...patch }))
   }
 
+  const modeClass = (isSelected) =>
+    `origin-left whitespace-nowrap uppercase tracking-[0.14em] text-white transition-all duration-200 hover:scale-110 hover:text-zinc-100 ${
+      isSelected ? "scale-110 text-5xl font-bold" : "text-4xl font-normal"
+    }`
+
   const optionClass = (isSelected) =>
     `origin-left whitespace-nowrap uppercase tracking-[0.08em] text-zinc-400 transition-all duration-200 hover:scale-110 hover:text-zinc-200 ${
       isSelected ? "text-zinc-300 underline decoration-2 underline-offset-8" : ""
     }`
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-background px-8 py-8 md:px-14 md:py-10">
-      <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-6xl flex-col">
-        <div className="mt-2 flex items-end justify-between gap-8">
-          <div className="translate-y-1 text-4xl text-zinc-300 md:text-5xl">
-            *User*
-          </div>
+    <main className="relative min-h-screen overflow-hidden bg-background px-8 py-10 md:px-14 md:py-12">
+      <img
+        src="/menu-stars.png"
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 -z-20 h-full w-full rotate-90 scale-[1.8] object-cover opacity-70"
+      />
+      <div className="pointer-events-none fixed inset-0 -z-10 bg-[#070b16]/65" />
 
-          <h1 className="translate-y-1 whitespace-nowrap text-center text-6xl uppercase tracking-[0.22em] text-foreground md:text-7xl">
+      <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-6xl flex-col">
+        <div className="relative mt-4 flex items-end justify-between gap-8">
+          <div className="text-4xl text-zinc-300 md:text-5xl">*User*</div>
+
+          <h1 className="pointer-events-none absolute left-1/2 -translate-x-1/2 translate-y-1 whitespace-nowrap text-center text-6xl font-bold uppercase tracking-[0.22em] text-foreground md:text-7xl">
             Созвездия
           </h1>
 
-          <Link
-            href="/rules"
-            className="translate-y-1 text-right text-4xl uppercase tracking-[0.18em] text-zinc-300 transition-all duration-200 hover:scale-110 hover:text-white md:text-5xl"
-          >
+          <Link href="/rules" className={rulesButtonClass}>
             Правила
           </Link>
         </div>
 
-        <div className="mt-16 grid flex-1 gap-14 md:mt-20 md:grid-cols-[1fr_1.08fr] md:gap-20">
-          <section>
+        <div className="mt-18 grid flex-1 gap-14 md:mt-24 md:grid-cols-[0.92fr_1.08fr] md:gap-12">
+          <section className="pr-6">
             <h2 className="mb-4 whitespace-nowrap text-5xl font-bold uppercase tracking-[0.18em] text-foreground">
               Режим игры
             </h2>
@@ -90,25 +104,10 @@ export default function HomePage() {
                   <button
                     key={mode.id}
                     onClick={() => setSelectedMode(mode.id)}
-                    className="grid grid-cols-[2rem_auto_1fr] items-baseline gap-4 text-left"
+                    className="grid grid-cols-[auto_1fr] items-baseline gap-3 text-left"
                   >
-                    <span
-                      className={`origin-center text-3xl text-zinc-300 transition-all duration-200 ${
-                        isSelected ? "rotate-[-90deg] opacity-100" : "opacity-0"
-                      }`}
-                    >
-                      √
-                    </span>
-                    <span
-                      className={`origin-left whitespace-nowrap uppercase tracking-[0.14em] text-white transition-all duration-200 hover:scale-110 hover:text-zinc-100 ${
-                        isSelected
-                          ? "scale-110 text-foreground text-5xl font-bold"
-                          : "text-4xl font-bold"
-                      }`}
-                    >
-                      {mode.label}
-                    </span>
-                    <span className="text-4xl tracking-[0.08em] text-zinc-500">
+                    <span className={modeClass(isSelected)}>{mode.label}</span>
+                    <span className="whitespace-nowrap text-4xl tracking-[0.08em] text-zinc-500">
                       {mode.description}
                     </span>
                   </button>
@@ -117,17 +116,15 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section>
-            <button onClick={() => setSelectedMode("custom")} className="mb-4 text-left text-white">
-              <span className="whitespace-nowrap text-5xl font-bold uppercase tracking-[0.18em]">
-                Индивидуальная настройка
-              </span>
-            </button>
+          <section className="pl-2">
+            <div className="mb-4 whitespace-nowrap text-5xl font-bold uppercase tracking-[0.18em] text-white">
+              Индивидуальная настройка
+            </div>
             <div className="mb-8 h-px w-full bg-foreground/20" />
 
             <div className="flex flex-col gap-8">
-              <div className="grid grid-cols-[auto_1fr] items-baseline gap-4">
-                <p className="whitespace-nowrap text-4xl tracking-[0.08em] text-white">Жизни</p>
+              <div className="grid grid-cols-[auto_1fr] items-baseline gap-3">
+                <p className="whitespace-nowrap text-5xl tracking-[0.08em] text-white">Жизни</p>
                 <div className="flex flex-wrap gap-8">
                   {[1, 3, 5].map((num) => (
                     <button
@@ -141,8 +138,8 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-[auto_1fr] items-baseline gap-4">
-                <p className="whitespace-nowrap text-4xl tracking-[0.08em] text-white">Способ ввода</p>
+              <div className="grid grid-cols-[auto_1fr] items-baseline gap-3">
+                <p className="whitespace-nowrap text-5xl tracking-[0.08em] text-white">Способ ввода</p>
                 <div className="flex flex-wrap gap-8">
                   {inputMethodChoices.map((method) => (
                     <button
@@ -156,8 +153,8 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-[auto_1fr] items-baseline gap-4">
-                <p className="whitespace-nowrap text-4xl tracking-[0.08em] text-white">Подсказки</p>
+              <div className="grid grid-cols-[auto_1fr] items-baseline gap-3">
+                <p className="whitespace-nowrap text-5xl tracking-[0.08em] text-white">Подсказки</p>
                 <div className="flex flex-wrap gap-8">
                   {difficultyChoices.map((diff) => (
                     <button
@@ -174,11 +171,8 @@ export default function HomePage() {
           </section>
         </div>
 
-        <div className="pointer-events-none fixed bottom-8 right-8 md:bottom-10 md:right-14">
-          <Link
-            href={gameUrl}
-            className="pointer-events-auto origin-right whitespace-nowrap text-5xl uppercase tracking-[0.18em] text-foreground transition-all duration-200 hover:scale-110 hover:text-white md:text-6xl"
-          >
+        <div className="pointer-events-none fixed bottom-10 right-14">
+          <Link href={gameUrl} className={actionButtonClass}>
             Начать
           </Link>
         </div>

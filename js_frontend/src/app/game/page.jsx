@@ -7,6 +7,12 @@ import { allConstellations, constellations } from "./constellations-data"
 
 const allConstellationNames = allConstellations
 
+const topRightButtonClass =
+  "fixed top-8 right-14 z-50 text-right text-4xl uppercase tracking-[0.18em] text-zinc-300 transition-colors duration-200 hover:text-white md:text-5xl"
+
+const bottomRightActionClass =
+  "fixed bottom-10 right-14 z-50 whitespace-nowrap text-right text-5xl uppercase tracking-[0.18em] text-foreground transition-all duration-200 hover:scale-110 hover:text-white md:text-6xl"
+
 function getRandomConstellation() {
   return allConstellationNames[Math.floor(Math.random() * allConstellationNames.length)]
 }
@@ -446,29 +452,29 @@ function GameContent() {
       {/* Rules button - top right with padding */}
       <Link
         href={`/rules?returnTo=${encodeURIComponent(returnUrl)}`}
-        className="fixed top-6 right-8 text-2xl font-display text-muted-foreground hover:text-foreground transition-all duration-200 uppercase tracking-widest z-50"
+        className={topRightButtonClass}
       >
         Правила
       </Link>
 
       {/* Header with start and target - at edges and bigger */}
-      <div className="w-full max-w-4xl flex justify-between items-start mb-8 px-2 relative z-10">
+      <div className="mt-14 flex w-full max-w-6xl justify-between gap-8 relative z-10">
         <div className="text-left">
-          <p className="text-4xl tracking-[0.08em] text-white mb-1">Старт</p>
-          <p className="text-4xl md:text-5xl text-zinc-300 tracking-[0.08em]">{gameState.startConstellation}</p>
+          <p className="text-5xl font-bold tracking-[0.08em] text-white">Старт</p>
+          <p className="text-5xl tracking-[0.08em] text-zinc-300">{gameState.startConstellation}</p>
         </div>
         <div className="text-right">
-          <p className="text-4xl tracking-[0.08em] text-white mb-1">Финиш</p>
-          <p className="text-4xl md:text-5xl text-zinc-300 tracking-[0.08em]">{gameState.targetConstellation}</p>
+          <p className="text-5xl font-bold tracking-[0.08em] text-white">Финиш</p>
+          <p className="text-5xl tracking-[0.08em] text-zinc-300">{gameState.targetConstellation}</p>
         </div>
       </div>
 
       {/* Current constellation */}
       <div className="text-center mb-6 relative z-10">
-        <p className="text-4xl tracking-[0.08em] text-white mb-3">
+        <p className="text-5xl tracking-[0.08em] text-white mb-3 md:text-6xl">
           Текущее созвездие
         </p>
-        <p className="text-5xl md:text-6xl text-foreground tracking-[0.12em] drop-shadow-[0_0_20px_rgba(255,255,255,0.4)]">
+        <p className="text-5xl md:text-6xl font-bold text-foreground tracking-[0.12em] drop-shadow-[0_0_20px_rgba(255,255,255,0.4)]">
           {gameState.currentConstellation}
         </p>
       </div>
@@ -514,10 +520,10 @@ function GameContent() {
       <button
         onClick={checkIfUsed}
         disabled={!input.trim()}
-        className={`text-lg mb-6 transition-all duration-200 relative z-10 tracking-wide ${
+        className={`text-4xl mb-6 transition-colors duration-200 relative z-10 tracking-[0.08em] ${
           checkResult === "used"
             ? "text-amber-500"
-            : "text-muted-foreground hover:text-foreground disabled:opacity-30"
+            : "text-zinc-400 hover:text-zinc-300 disabled:opacity-30"
         }`}
       >
         {checkResult === "used" ? "Уже названо" : checkResult === "unused" ? "Ещё не названо" : "Проверить"}
@@ -526,7 +532,7 @@ function GameContent() {
       {/* Hints - available neighbors (only on easy) */}
       {showNeighbors && (
         <div className="mb-8 text-center relative z-10">
-          <p className="text-lg text-muted-foreground mb-2 tracking-[0.15em]">Доступные соседи</p>
+          <p className="mb-2 text-2xl tracking-[0.12em] text-zinc-300">Доступные соседи</p>
           <div className="flex flex-wrap justify-center gap-2">
             {neighborMoves.map((move) => (
               <button
@@ -579,7 +585,7 @@ function GameContent() {
       {/* End game button - bottom right with padding */}
       <button
         onClick={handleEndGame}
-        className="fixed bottom-8 right-8 text-2xl font-display text-muted-foreground hover:text-foreground transition-all duration-200 uppercase tracking-widest z-50"
+        className={bottomRightActionClass}
       >
         Завершить
       </button>
