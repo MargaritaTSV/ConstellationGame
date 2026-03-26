@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
 
 const rulesButtonClass =
-  " top-7 right-8 z-50 text-right text-4xl uppercase tracking-[0.18em] text-zinc-300 transition-colors duration-200 hover:text-white md:top-12 md:right-14 md:text-5xl"
+  "fixed top-7 right-8 z-50 text-right text-4xl uppercase tracking-[0.18em] text-zinc-300 transition-colors duration-200 hover:text-white md:top-12 md:right-14 md:text-5xl"
 
 const topLeftUserClass =
   "fixed top-7 left-8 z-50 text-left text-4xl text-zinc-300 md:top-12 md:left-14 md:text-5xl"
@@ -40,9 +40,9 @@ function ResultContent() {
                 className="pointer-events-none fixed inset-0 -z-20 h-full w-full object-cover"
          />
       <div className=" w-full pointer-events-none fixed inset-0 -z-10 bg-[#070b16]/65" />
-        <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-6xl flex-col">
-          <div className="relative">
-            <h1 className="pointer-events-none absolute inset-x-0 top-0 text-center whitespace-nowrap text-6xl font-bold uppercase tracking-[0.22em] text-foreground">
+        <div className="relative mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-6xl flex-col">
+          <div className="relative mx-auto">
+            <h1 className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 text-center whitespace-nowrap text-6xl font-bold uppercase tracking-[0.2em] text-foreground">
               {result === "won" ? "Победа" : "Поражение"}
             </h1>
           <div className={topLeftUserClass}>*User*</div>
@@ -51,15 +51,15 @@ function ResultContent() {
           </Link>
         </div>
 
-        <div className="mt-14 flex justify-between gap-8">
+        <div className="mt-28 flex justify-between gap-8">
           <div className="text-left">
             <p className="text-5xl font-bold tracking-[0.08em] text-white">Старт</p>
-            <p className="ml-12 text-5xl tracking-[0.08em] text-zinc-300">{start}</p>
+            <p className="ml-12 text-5xl tracking-[0.08em] text-zinc-400">{start}</p>
           </div>
 
           <div className="text-right">
             <p className="text-5xl font-bold tracking-[0.08em] text-white">Финиш</p>
-            <p className="ml-12 text-5xl tracking-[0.08em] text-zinc-300">{target}</p>
+            <p className="ml-12 text-5xl tracking-[0.08em] text-zinc-400">{target}</p>
           </div>
         </div>
 
