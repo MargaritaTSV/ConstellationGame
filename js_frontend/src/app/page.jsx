@@ -6,7 +6,7 @@ import Link from "next/link"
 const presetModes = [
   { id: "easy", label: "Легкий", description: "5 жизней, подсказки." },
   { id: "normal", label: "Средний", description: "3 жизни, подсказки" },
-  { id: "hard", label: "Сложный", description: "1 жизнь." },
+  { id: "hard", label: "Сложный", description: "1 жизнь, нет подсказок" },
 ]
 
 const difficultyChoices = [
@@ -19,11 +19,14 @@ const inputMethodChoices = [
   { id: "select", label: "из списка" },
 ]
 
-const rulesButtonClass =
-  "fixed top-8 right-14 z-50 text-right text-4xl uppercase tracking-[0.18em] text-zinc-300 transition-colors duration-200 hover:text-white md:text-5xl"
-
 const actionButtonClass =
-  "pointer-events-auto whitespace-nowrap text-right text-5xl uppercase tracking-[0.18em] text-foreground transition-all duration-200 hover:scale-110 hover:text-white md:text-6xl"
+  "pointer-events-auto z-50 whitespace-nowrap text-right text-5xl uppercase tracking-[0.18em] text-foreground transition-all duration-200 hover:scale-105 hover:text-white md:text-6xl"
+
+const rulesButtonClass =
+  "absolute top-8 z-50 text-right right-0 text-4xl uppercase tracking-[0.18em] text-zinc-300 transition-all duration-200 hover:text-white hover:scale-105 md:text-5xl"
+
+const userButtonClass =
+  "absolute top-8 z-50 text-left left-0 text-4xl uppercase tracking-[0.18em] text-zinc-300 transition-all duration-200 hover:text-white hover:scale-105 md:text-5xl"
 
 export default function HomePage() {
   const [selectedMode, setSelectedMode] = useState("normal")
@@ -67,7 +70,7 @@ export default function HomePage() {
     }`
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-background px-8 py-10 md:px-14 md:py-12">
+    <main className="relative h-screen overflow-hidden bg-background">
       <img
         src="/menu-stars.png"
         alt=""
@@ -75,28 +78,28 @@ export default function HomePage() {
         className="pointer-events-none fixed inset-0 -z-20 h-full w-full rotate-90 scale-[1.8] object-cover opacity-70"
       />
       <div className="pointer-events-none fixed inset-0 -z-10 bg-[#070b16]/65" />
-
-      <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-6xl flex-col">
-        <div className="relative mt-4 flex items-end justify-between gap-8">
-          <div className="text-4xl text-zinc-300 md:text-5xl">*User*</div>
-
-          <h1 className="pointer-events-none absolute left-1/2 -translate-x-1/2 translate-y-1 whitespace-nowrap text-center text-6xl font-bold uppercase tracking-[0.22em] text-foreground md:text-7xl">
+      {/*   Начинается главная часть страницы */}
+      <div className="mx-auto flex h-full w-full flex-col px-8 py-7 md:px-14 md:py-12">
+        <div className="relative">
+          <div className="pointer-events-none absolute inset-x-0 top-0 text-center whitespace-nowrap text-6xl font-bold uppercase tracking-[0.22em] text-foreground md:text-7xl">
             Созвездия
-          </h1>
-
+          </div>
           <Link href="/rules" className={rulesButtonClass}>
             Правила
           </Link>
+          <div className={userButtonClass}>
+              User
+          </div>
         </div>
 
-        <div className="mt-18 grid flex-1 gap-14 md:mt-24 md:grid-cols-[0.92fr_1.08fr] md:gap-12">
-          <section className="pr-6">
-            <h2 className="mb-4 whitespace-nowrap text-5xl font-bold uppercase tracking-[0.18em] text-foreground">
+        <div className="grid py-10 flex-1 gap-14 md:mt-24 md:grid-cols-[0.92fr_1.08fr] md:gap-12">
+          <section className="pr-0">
+            <h2 className="mb-5 whitespace-nowrap text-5xl font-bold uppercase tracking-[0.18em] text-foreground">
               Режим игры
             </h2>
-            <div className="mb-8 h-px w-full bg-foreground/20" />
+            <div className="mb-10 h-px w-full bg-foreground/20" />
 
-            <div className="flex flex-col gap-8">
+            <div className="flex flex-col gap-10">
               {presetModes.map((mode) => {
                 const isSelected = selectedMode === mode.id
 
@@ -117,7 +120,7 @@ export default function HomePage() {
           </section>
 
           <section className="pl-2">
-            <div className="mb-4 whitespace-nowrap text-5xl font-bold uppercase tracking-[0.18em] text-white">
+            <div className="mb-5 whitespace-nowrap text-5xl font-bold uppercase tracking-[0.18em] text-white">
               Индивидуальная настройка
             </div>
             <div className="mb-8 h-px w-full bg-foreground/20" />
@@ -176,6 +179,7 @@ export default function HomePage() {
             Начать
           </Link>
         </div>
+
       </div>
     </main>
   )
