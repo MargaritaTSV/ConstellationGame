@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
 
 const rulesButtonClass =
-  "fixed top-7 right-8 z-50 text-right text-4xl uppercase tracking-[0.18em] text-zinc-300 transition-colors duration-200 hover:text-white md:top-12 md:right-14 md:text-5xl"
+  " top-7 right-8 z-50 text-right text-4xl uppercase tracking-[0.18em] text-zinc-300 transition-colors duration-200 hover:text-white md:top-12 md:right-14 md:text-5xl"
 
 const topLeftUserClass =
   "fixed top-7 left-8 z-50 text-left text-4xl text-zinc-300 md:top-12 md:left-14 md:text-5xl"
@@ -32,22 +32,20 @@ function ResultContent() {
     path.length > 0 ? `/api/path-image?path=${encodeURIComponent(JSON.stringify(path))}` : null
 
   return (
-    <main className="relative isolate min-h-screen bg-background px-8 py-7 md:px-14 md:py-12">
+    <main className="relative isolate min-h-screen bg-background py-7 md:py-12">
         <img
                 src="/background_v3.jpg"
                 alt=""
                 aria-hidden="true"
                 className="pointer-events-none fixed inset-0 -z-20 h-full w-full object-cover"
          />
-      <div className="pointer-events-none fixed inset-0 -z-10 bg-[#070b16]/65" />
-      <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-6xl flex-col">
-        <div className="relative mt-4 flex items-end justify-between gap-8">
+      <div className=" w-full pointer-events-none fixed inset-0 -z-10 bg-[#070b16]/65" />
+        <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-6xl flex-col">
+          <div className="relative">
+            <h1 className="pointer-events-none absolute inset-x-0 top-0 text-center whitespace-nowrap text-6xl font-bold uppercase tracking-[0.22em] text-foreground">
+              {result === "won" ? "Победа" : "Поражение"}
+            </h1>
           <div className={topLeftUserClass}>*User*</div>
-
-          <h1 className="pointer-events-none absolute left-1/2 -translate-x-1/2 translate-y-1 whitespace-nowrap text-center text-6xl font-bold uppercase tracking-[0.22em] text-foreground md:text-7xl">
-            {result === "won" ? "Победа" : "Поражение"}
-          </h1>
-
           <Link href="/" className={rulesButtonClass}>
             Назад
           </Link>
