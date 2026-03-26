@@ -60,8 +60,8 @@ export default function HomePage() {
   }
 
   const modeClass = (isSelected) =>
-    `origin-left whitespace-nowrap uppercase leading-none tracking-[0.14em] text-white transition-colors duration-200 hover:text-zinc-100 ${
-      isSelected ? "text-5xl font-normal" : "text-4xl font-normal"
+    `origin-left whitespace-nowrap uppercase leading-none tracking-[0.14em] text-white transition-all duration-200 hover:text-zinc-100 ${
+      isSelected ? "text-5xl font-normal" : "text-4xl font-normal hover:scale-105"
     }`
 
   const optionClass = (isSelected) =>
@@ -70,12 +70,12 @@ export default function HomePage() {
     }`
 
   return (
-    <main className="relative h-screen overflow-hidden bg-background">
+    <main className="relative isolate h-screen overflow-hidden bg-background">
       <img
-        src="/menu-stars.png"
+        src="/background_v3.jpg"
         alt=""
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 -z-20 h-full w-full rotate-90 scale-[1.8] object-cover opacity-70"
+        className="pointer-events-none fixed inset-0 -z-20 h-full w-full object-cover"
       />
       <div className="pointer-events-none fixed inset-0 -z-10 bg-[#070b16]/65" />
       {/*   Начинается главная часть страницы */}
@@ -93,7 +93,7 @@ export default function HomePage() {
         </div>
 
         <div className="grid py-10 flex-1 gap-14 md:mt-24 md:grid-cols-[0.92fr_1.08fr] md:gap-12">
-          <section className="pr-0">
+          <section className="pr-0 ml-10">
             <h2 className="mb-5 whitespace-nowrap text-5xl font-bold uppercase tracking-[0.1em] text-foreground">
               Режим игры
             </h2>
